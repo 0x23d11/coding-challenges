@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -44,6 +45,33 @@ int getFileLines(const char *filename) {
     return lines;
 }
 
+int getFileWords(const char *filename) {
+    int wordCount = 0;
+    char ch;
+    int prevCharSpace = 1; // flag to track if the previous character was a space
+    FILE *fp = fopen(filename, "r");
+    if (fp==NULL) {
+        perror("Error opening file");
+        return -1;
+    }
+
+    while ((ch = fgetc(fp)) != EOF) {
+        // check if current char is space or not
+        if (isspace(ch)) {
+            prevCharSpace = 1;
+        } else {
+            // If prev char was a space, increment word count
+            if (prevCharSpace) {
+                wordCount++;
+            }
+            prevCharSpace = 0;
+        }
+    }
+    fclose(fp);
+    return wordCount;
+
+}
+
 
 
 int main(int argc, char *argv[]) {
@@ -60,11 +88,12 @@ int main(int argc, char *argv[]) {
                 printf("%d\n", fileLines);
             }
 
-        }
-
-
-
-        else {
+        } else if (argv[1][0] == '-' && argv[1][1] == 'w' && argv[1][2] == '\0') {
+            int fileWords = getFileWords(argv[2]);
+            if (fileWords != -1) {
+                printf("%d\n", fileWords);
+            }
+        } else {
             fprintf(stderr, "Invalid option. Usage: %s -c <filename>\n", argv[0]);
             return 1;
         }
