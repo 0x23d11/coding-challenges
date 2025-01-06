@@ -23,6 +23,29 @@ long int getFileSize(const char *filename) {
     return size;
 }
 
+// Function to get the count of total lines in the file
+int getFileLines(const char *filename) {
+    int lines = 0;
+    char ch;
+    FILE *fp = fopen(filename, "r"); // reading the file
+    
+    // file error handling
+    if (fp == NULL) {
+        perror("Error opening file");
+        return -1;
+    }
+    // line counting logic
+    while ((ch = fgetc(fp)) != EOF) {
+        if (ch == '\n') {
+            lines++;
+        }
+    }
+    fclose(fp); // closing the file
+    return lines;
+}
+
+
+
 int main(int argc, char *argv[]) {
     if (argc == 3) {
         // Check if the first argument is "-c"
@@ -31,7 +54,17 @@ int main(int argc, char *argv[]) {
             if (fileSize != -1) {
                 printf("%ld\n", fileSize);
             }
-        } else {
+        } else if (argv[1][0] == '-' && argv[1][1] == 'l' && argv[1][2] == '\0') {
+            int fileLines = getFileLines(argv[2]);
+            if (fileLines != -1) {
+                printf("%d\n", fileLines);
+            }
+
+        }
+
+
+
+        else {
             fprintf(stderr, "Invalid option. Usage: %s -c <filename>\n", argv[0]);
             return 1;
         }
